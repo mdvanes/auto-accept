@@ -3,6 +3,8 @@
     "version": "1.0",
     "description": "Auto accept dialog periodically",
     "permissions": [
+        "activeTab",
+        "declarativeContent",
         "storage"
     ],
     "background": {
