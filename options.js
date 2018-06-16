@@ -22,6 +22,7 @@ function constructOptions() {
     } else {
       activeToggle.removeAttribute('checked');
     }
+    M.updateTextFields();
   });
 
   // TODO deduplicate code with popup.js

@@ -2,29 +2,116 @@
 <html>
   <head>
     <style>
+      html, body {
+        background-color: #e8eaf6;
+      }
+
+      :root {
+        --primary-color: #3f51b5;
+      }
+
+      /* label color */
+      /*.input-field label {
+        color: var(--primary-color) !important;
+      }*/
+      /* label focus color */
+      .input-field input[type=text]:focus + label,
+      .input-field input[type=number]:focus + label {
+        color: var(--primary-color) !important;
+      }
+      /* label underline focus color */
+      .input-field input[type=text]:focus,
+      .input-field input[type=number]:focus {
+        border-bottom: 1px solid var(--primary-color) !important;
+        box-shadow: 0 1px 0 0 var(--primary-color) !important;
+      }
+      /*!* valid color *!*/
+      /*.input-field input[type=text].valid {*/
+        /*border-bottom: 1px solid #000;*/
+        /*box-shadow: 0 1px 0 0 #000;*/
+      /*}*/
+      /*!* invalid color *!*/
+      /*.input-field input[type=text].invalid {*/
+        /*border-bottom: 1px solid #000;*/
+        /*box-shadow: 0 1px 0 0 #000;*/
+      /*}*/
+      /*!* icon prefix focus color *!*/
+      /*.input-field .prefix.active {*/
+        /*color: #000;*/
+      /*}*/
+
+      .switch label input[type=checkbox]:checked+.lever:after {
+        background-color: #3f51b5 !important;
+      }
+      .switch label input[type=checkbox]:checked+.lever {
+        background-color: #9fa8da !important;
+      }
     </style>
+    <link rel="stylesheet" href="./vendor/css/materialize.min.css">
+    <script src="./vendor/js/materialize.min.js"></script>
   </head>
   <body>
-  <div>
-    Plugin is active: <input type="checkbox" id="activeToggle"/>
+
+  <div class="container">
+    <div class="row">
+      <div class="col s6 offset-s3">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">AutoAccept Options</span>
+
+            <form>
+              <p>
+                Plugin state
+                <span class="new badge indigo"
+                      data-badge-caption="auto accepts"
+                      id="counter">
+                  0
+                </span>
+              </p>
+              <div class="switch">
+                <label>
+                  Off
+                  <input type="checkbox" id="activeToggle"/>
+                  <span class="lever"></span>
+                  On
+                </label>
+              </div>
+
+              <br>
+              <div class="input-field">
+                <input type="number" id="reloadTimer"/>
+                <label for="reloadTimer">Reload timer (ms)</label>
+              </div>
+
+              <div class="input-field">
+                <input type="text" id="pageSelector"/>
+                <label for="pageSelector">Selector to find element to match page</label>
+              </div>
+              <p>e.g. h1 (requires active toggle)</p>
+              <br>
+
+              <div class="input-field">
+                <input type="text" id="pageValue"/>
+                <label for="pageValue">Text value for element to match page</label>
+              </div>
+              <p>e.g. My page title (requires active toggle)</p>
+              <br>
+
+              <div class="input-field">
+                <input type="text" id="buttonSelector"/>
+                <label for="buttonSelector">Selector to click</label>
+              </div>
+              <p>(requires active toggle)</p>
+            </form>
+          </div>
+          <div class="card-action">
+            <a class="btn waves-effect waves-light indigo" href="https://github.com/mdvanes">About me</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <br>
-  <div>
-    Reload timer: <input type="number" id="reloadTimer"/>
-  </div>
-  <div>
-    Selector to find element to match page: <input id="pageSelector"/> e.g. h1 (requires active toggle)
-  </div>
-  <div>
-    Text value for element to match page: <input id="pageValue"/> e.g. My title (requires active toggle)
-  </div>
-  <div>
-    Selector to click: <input id="buttonSelector"/> (requires active toggle)
-  </div>
-  <br>
-  <div>
-    Congrats, accepted <span id="counter"></span> times on your behalf.
-  </div>
+
   <script src="options.js"></script>
   </body>
 </html>
