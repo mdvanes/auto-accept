@@ -1,13 +1,8 @@
 'use strict';
 
 chrome.runtime.onInstalled.addListener(function () {
-  chrome.storage.sync.set({ color: '#3aa757' }, function () {
-    console.log('The color is green.');
-  });
-  chrome.storage.sync.set({ isActive: false }, function () {
-    console.log('Onload isActive is false');
-  });
   chrome.storage.sync.set({
+    isActive: false,
     acceptCounter: 0,
     reloadTimer: 2000,
   });
@@ -41,7 +36,7 @@ function setIntervalOn(tabs) {
       // Reload tab
       chrome.tabs.reload(targetTabId, {bypassCache: true}, () => {
         //chrome.extension.getBackgroundPage().console.log('Interval!');
-        console.log('Interval!');
+        console.log('Accept!');
         // Note: timeout needed to run executeScript in this callback
         setTimeout(() => {
           // Click the element

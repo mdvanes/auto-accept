@@ -1,18 +1,5 @@
-let page = document.getElementById('buttonDiv');
 let activeToggle = document.getElementById('activeToggle');
-const kButtonColors = ['#3aa757', '#e8453c', '#f9bb2d', '#4688f1'];
-function constructOptions(kButtonColors) {
-  for (let item of kButtonColors) {
-    let button = document.createElement('button');
-    button.style.backgroundColor = item;
-    button.addEventListener('click', function() {
-      chrome.storage.sync.set({color: item}, function() {
-        console.log('color is ' + item);
-      })
-    });
-    page.appendChild(button);
-  }
-
+function constructOptions() {
   chrome.storage.sync.get(['acceptCounter', 'reloadTimer', 'isActive'], data => {
     document.getElementById('counter').innerText = data.acceptCounter;
     document.getElementById('reloadTimer').value = data.reloadTimer;
@@ -54,4 +41,4 @@ function constructOptions(kButtonColors) {
     }
   })
 }
-constructOptions(kButtonColors);
+constructOptions();
