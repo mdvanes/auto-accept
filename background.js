@@ -49,37 +49,41 @@ function setIntervalOn(tabs) {
       return;
     }
 
-    console.log(data.pageSelector, data.pageValue);
-    chrome.tabs.executeScript(
-      targetTabId,
-      {
-        // TODO susceptible to XSS
-        code: `document.querySelector('${data.pageSelector}').innerText;`
-      }, data => {
-        console.log('page match ok', data, data[0] === data.pageValue);
-      });
-
     // Only run on tab where toggle was set to true, but can be turned off anywhere
     aaInterval = setInterval(() => {
-      // Reload tab
-      chrome.tabs.reload(targetTabId, {bypassCache: true}, () => {
-        //chrome.extension.getBackgroundPage().console.log('Interval!');
-        console.log('Accept!');
-        // Note: timeout needed to run executeScript in this callback
-        setTimeout(() => {
-          // Click the element
-          chrome.tabs.executeScript(
-            targetTabId,
-            {
-              // TODO susceptible to XSS
-              code: `document.querySelector('${data.buttonSelector}').click();`
-            }, () => {
-              chrome.storage.sync.get('acceptCounter', acceptCounterData => {
-                chrome.storage.sync.set({ acceptCounter: acceptCounterData.acceptCounter + 1 });
-              });
+      chrome.tabs.executeScript(
+        targetTabId,
+        {
+          // TODO susceptible to XSS
+          code: `document.querySelector('${data.pageSelector}').innerText;`
+        }, pageSelectorData => {
+          // console.log('page match ok', pageSelectorData, pageSelectorData[0],
+          //   typeof pageSelectorData[0], pageSelectorData[0] === data.pageValue);
+          // Only run if the configured page is visible
+          if(pageSelectorData[0] === data.pageValue) {
+            // Reload tab
+            chrome.tabs.reload(targetTabId, {bypassCache: true}, () => {
+              //chrome.extension.getBackgroundPage().console.log('Interval!');
+              console.log('Accept!');
+              // Note: timeout needed to run executeScript in this callback
+              setTimeout(() => {
+                // Click the element
+                chrome.tabs.executeScript(
+                  targetTabId,
+                  {
+                    // TODO susceptible to XSS
+                    code: `document.querySelector('${data.buttonSelector}').click();`
+                  }, () => {
+                    chrome.storage.sync.get('acceptCounter', acceptCounterData => {
+                      chrome.storage.sync.set({ acceptCounter: acceptCounterData.acceptCounter + 1 });
+                    });
+                  });
+              }, 100);
             });
-        }, 100);
-      });
+          } else {
+            console.log('Not on configured page');
+          }
+        });
     }, data.reloadTimer);
   });
 }
@@ -90,8 +94,7 @@ function setIntervalOn(tabs) {
 //   // }
 // });
 
-// TODO page match in options
-// TODO only run for  supplied tab
+// TODO only run for supplied tab
 
 function setIntervalOff() {
   console.log('%csetIntervalOff', 'color: red; font-weight: bold;');
