@@ -30,7 +30,7 @@ function setIntervalOn(tabs) {
   console.log('%csetIntervalOn', 'color: green; font-weight: bold;', 'tabs:', tabs);
   const targetTabId = tabs[0].id;
 
-  chrome.storage.sync.get('reloadTimer', reloadTimerData => {
+  chrome.storage.sync.get(['reloadTimer', 'buttonSelector'], data => {
     // Only run on tab where toggle was set to true, but can be turned off anywhere
     aaInterval = setInterval(() => {
       // Reload tab
@@ -43,14 +43,14 @@ function setIntervalOn(tabs) {
           chrome.tabs.executeScript(
             targetTabId,
             // TODO button selector in options
-            {code: 'document.querySelector(\'button\').click();'}, () => {
-              chrome.storage.sync.get('acceptCounter', data => {
-                chrome.storage.sync.set({ acceptCounter: data.acceptCounter + 1 });
+            {code: 'document.querySelector(\'' + data.buttonSelector + '\').click();'}, () => {
+              chrome.storage.sync.get('acceptCounter', acceptCounterData => {
+                chrome.storage.sync.set({ acceptCounter: acceptCounterData.acceptCounter + 1 });
               });
             });
         }, 100);
       });
-    }, reloadTimerData.reloadTimer);
+    }, data.reloadTimer);
   });
 }
 

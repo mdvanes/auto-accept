@@ -5,15 +5,18 @@
     </style>
   </head>
   <body>
-    <div>
-      nr of accepts: <span id="counter"></span>
-    </div>
-    <div>
-      reloadTimer: <input type="number" id="reloadTimer"/>
-    </div>
-    <div>
-      is active: <input type="checkbox" id="activeToggle"/>
-    </div>
-    <script src="options.js"></script>
+  <div>
+    Plugin is active: <input type="checkbox" id="activeToggle"/>
+  </div>
+  <div>
+    Reload timer: <input type="number" id="reloadTimer"/>
+  </div>
+  <div>
+    Selector to click: <input id="buttonSelector"/> (requires active toggle)
+  </div>
+  <div>
+    Congrats, accepted <span id="counter"></span> times on your behalf.
+  </div>
+  <script src="options.js"></script>
   </body>
 </html>
