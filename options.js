@@ -1,8 +1,10 @@
 let activeToggle = document.getElementById('activeToggle');
+let buttonSelector =  document.getElementById('buttonSelector');
 function constructOptions() {
-  chrome.storage.sync.get(['acceptCounter', 'reloadTimer', 'isActive'], data => {
+  chrome.storage.sync.get(['acceptCounter', 'reloadTimer', 'isActive', 'buttonSelector'], data => {
     document.getElementById('counter').innerText = data.acceptCounter;
     document.getElementById('reloadTimer').value = data.reloadTimer;
+    buttonSelector.value = data.buttonSelector;
     if(data.isActive) {
       activeToggle.setAttribute('checked', true);
     } else {
@@ -24,6 +26,11 @@ function constructOptions() {
     });
   };
 
+  buttonSelector.onchange = event => {
+    chrome.storage.sync.set({ buttonSelector: event.target.value }, () => {
+    });
+  };
+
   chrome.storage.onChanged.addListener(changes => {
     console.log(changes);
     if(changes.acceptCounter) {
@@ -32,7 +39,11 @@ function constructOptions() {
     if(changes.reloadTimer) {
       document.getElementById('reloadTimer').value = changes.reloadTimer.newValue;
     }
+    if(changes.buttonSelector) {
+      buttonSelector.value = changes.buttonSelector.newValue;
+    }
     if(changes.isActive) {
+      console.log(changes.isActive.newValue)
       if(changes.isActive.newValue) {
         activeToggle.setAttribute('checked', true);
       } else {
