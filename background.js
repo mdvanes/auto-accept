@@ -35,7 +35,8 @@ function setIntervalOn(tabs) {
   aaInterval = setInterval(() => {
     // Reload tab
     chrome.tabs.reload(targetTabId, {bypassCache: true}, () => {
-      chrome.extension.getBackgroundPage().console.log('Interval!', targetTabId);
+      //chrome.extension.getBackgroundPage().console.log('Interval!');
+      console.log('Interval!');
       // Note: timeout needed to run executeScript in this callback
       setTimeout(() => {
         // Click the element
@@ -43,8 +44,8 @@ function setIntervalOn(tabs) {
           targetTabId,
           // TODO button selector in options
           {code: 'document.querySelector(\'button\').click();'}, () => {
-            chrome.storage.sync.get('isActive', data => {
-              chrome.storage.sync.set({ acceptCounter: data + 1 }); // TODO show in options
+            chrome.storage.sync.get('acceptCounter', data => {
+              chrome.storage.sync.set({ acceptCounter: data.acceptCounter + 1 });
             });
           });
       }, 100);

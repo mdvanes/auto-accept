@@ -11,5 +11,10 @@ function constructOptions(kButtonColors) {
     });
     page.appendChild(button);
   }
+
+  chrome.storage.sync.get('acceptCounter', data => {
+    console.log(data);
+    document.getElementById('counter').innerText = data.acceptCounter;
+  });
 }
 constructOptions(kButtonColors);
