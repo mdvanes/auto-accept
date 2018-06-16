@@ -16,7 +16,9 @@
    preserveAspectRatio="xMidYMid meet"
    viewBox="0 0 480 480"
    sodipodi:docname="reload_ok.svg"
-   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   inkscape:export-xdpi="3.2"
+   inkscape:export-ydpi="3.2">
   <metadata
      id="metadata50">
     <rdf:RDF>
@@ -44,7 +46,7 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:zoom="1.3906433"
-     inkscape:cx="353.72554"
+     inkscape:cx="227.52495"
      inkscape:cy="192.56666"
      inkscape:window-x="1920"
      inkscape:window-y="0"

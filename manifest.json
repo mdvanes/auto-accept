@@ -3,9 +3,13 @@
     "version": "1.0",
     "description": "Auto accept dialog periodically",
     "permissions": [
-        "activeTab",
-        "declarativeContent",
-        "storage"
+      "activeTab",
+      "declarativeContent",
+      "storage",
+      "tabs",
+      "http://*/",
+      "https://*/",
+      "file://*/"
     ],
     "background": {
         "scripts": [
