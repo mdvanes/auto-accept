@@ -2,10 +2,43 @@
 <html>
   <head>
     <style>
+      html, body {
+        width: 125px;
+      }
+
+      :root {
+        --primary-color: #3f51b5;
+      }
+
+      .switch label input[type=checkbox]:checked+.lever:after {
+        background-color: #3f51b5 !important;
+      }
+      .switch label input[type=checkbox]:checked+.lever {
+        background-color: #9fa8da !important;
+      }
+
     </style>
+    <link rel="stylesheet" href="./vendor/css/materialize.min.css">
+    <script src="./vendor/js/materialize.min.js"></script>
   </head>
   <body>
-    <input type="checkbox" id="activeToggle"> Active
+
+  <div class="container">
+    <div class="row">
+      <br>
+      <form>
+        <div class="switch">
+          <label>
+            Off
+            <input type="checkbox" id="activeToggle"/>
+            <span class="lever"></span>
+            On
+          </label>
+        </div>
+      </form>
+    </div>
+  </div>
+
     <script src="popup.js"></script>
   </body>
 </html>
