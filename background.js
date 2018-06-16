@@ -7,7 +7,10 @@ chrome.runtime.onInstalled.addListener(function () {
   chrome.storage.sync.set({ isActive: false }, function () {
     console.log('Onload isActive is false');
   });
-  chrome.storage.sync.set({ acceptCounter: 0 });
+  chrome.storage.sync.set({
+    acceptCounter: 0,
+    reloadTimer: 2000,
+  });
   chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
     chrome.declarativeContent.onPageChanged.addRules([
       {
@@ -26,31 +29,34 @@ chrome.runtime.onInstalled.addListener(function () {
 
 let aaInterval;
 
+// TODO unravel Pyramid of Doom
 // tab id is unique for browser session, tabs[0] is the initiating tab
 function setIntervalOn(tabs) {
   console.log('%csetIntervalOn', 'color: green; font-weight: bold;', 'tabs:', tabs);
   const targetTabId = tabs[0].id;
 
-  // Only run on tab where toggle was set to true, but can be turned off anywhere
-  aaInterval = setInterval(() => {
-    // Reload tab
-    chrome.tabs.reload(targetTabId, {bypassCache: true}, () => {
-      //chrome.extension.getBackgroundPage().console.log('Interval!');
-      console.log('Interval!');
-      // Note: timeout needed to run executeScript in this callback
-      setTimeout(() => {
-        // Click the element
-        chrome.tabs.executeScript(
-          targetTabId,
-          // TODO button selector in options
-          {code: 'document.querySelector(\'button\').click();'}, () => {
-            chrome.storage.sync.get('acceptCounter', data => {
-              chrome.storage.sync.set({ acceptCounter: data.acceptCounter + 1 });
+  chrome.storage.sync.get('reloadTimer', reloadTimerData => {
+    // Only run on tab where toggle was set to true, but can be turned off anywhere
+    aaInterval = setInterval(() => {
+      // Reload tab
+      chrome.tabs.reload(targetTabId, {bypassCache: true}, () => {
+        //chrome.extension.getBackgroundPage().console.log('Interval!');
+        console.log('Interval!');
+        // Note: timeout needed to run executeScript in this callback
+        setTimeout(() => {
+          // Click the element
+          chrome.tabs.executeScript(
+            targetTabId,
+            // TODO button selector in options
+            {code: 'document.querySelector(\'button\').click();'}, () => {
+              chrome.storage.sync.get('acceptCounter', data => {
+                chrome.storage.sync.set({ acceptCounter: data.acceptCounter + 1 });
+              });
             });
-          });
-      }, 100);
-    });
-  }, 2000); // TODO interval in options
+        }, 100);
+      });
+    }, reloadTimerData.reloadTimer);
+  });
 }
 
 //   // if (tab.url.indexOf("http://translate.google.hu/") > -1 &&
