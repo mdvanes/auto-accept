@@ -30,12 +30,35 @@ function setIntervalOn(tabs) {
   console.log('%csetIntervalOn', 'color: green; font-weight: bold;', 'tabs:', tabs);
   const targetTabId = tabs[0].id;
 
-  chrome.storage.sync.get(['reloadTimer', 'buttonSelector'], data => {
+  chrome.storage.sync.get([
+    'reloadTimer',
+    'buttonSelector',
+    'pageSelector',
+    'pageValue'], data => {
 
     if(!data.buttonSelector || data.buttonSelector === '') {
       alert('first set button selector in options');
       return;
     }
+    if(!data.pageSelector || data.pageSelector === '') {
+      alert('first set page selector in options');
+      return;
+    }
+    if(!data.pageValue || data.pageValue === '') {
+      alert('first set page value in options');
+      return;
+    }
+
+    console.log(data.pageSelector, data.pageValue);
+    chrome.tabs.executeScript(
+      targetTabId,
+      {
+        // TODO susceptible to XSS
+        code: `document.querySelector('${data.pageSelector}').innerText;`
+      }, data => {
+        console.log('page match ok', data, data[0] === data.pageValue);
+      });
+
     // Only run on tab where toggle was set to true, but can be turned off anywhere
     aaInterval = setInterval(() => {
       // Reload tab
@@ -48,6 +71,7 @@ function setIntervalOn(tabs) {
           chrome.tabs.executeScript(
             targetTabId,
             {
+              // TODO susceptible to XSS
               code: `document.querySelector('${data.buttonSelector}').click();`
             }, () => {
               chrome.storage.sync.get('acceptCounter', acceptCounterData => {
