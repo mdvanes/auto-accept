@@ -3,8 +3,7 @@
 chrome.runtime.onInstalled.addListener(function () {
   chrome.storage.sync.set({
     isActive: false,
-    acceptCounter: 0,
-    reloadTimer: 2000,
+    acceptCounter: 0
   });
   chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
     chrome.declarativeContent.onPageChanged.addRules([
@@ -51,22 +50,20 @@ function setIntervalOn(tabs) {
 
     // Only run on tab where toggle was set to true, but can be turned off anywhere
     aaInterval = setInterval(() => {
-      chrome.tabs.executeScript(
-        targetTabId,
-        {
-          // TODO susceptible to XSS
-          code: `document.querySelector('${data.pageSelector}').innerText;`
-        }, pageSelectorData => {
-          // console.log('page match ok', pageSelectorData, pageSelectorData[0],
-          //   typeof pageSelectorData[0], pageSelectorData[0] === data.pageValue);
-          // Only run if the configured page is visible
-          if(pageSelectorData[0] === data.pageValue) {
-            // Reload tab
-            chrome.tabs.reload(targetTabId, {bypassCache: true}, () => {
-              //chrome.extension.getBackgroundPage().console.log('Interval!');
-              console.log('Accept!');
+      // First reload tab to see if the configured page is returned
+      chrome.tabs.reload(targetTabId, {bypassCache: true}, () => {
+        // Check if the element is available that indicates that this is the configured page
+        chrome.tabs.executeScript(
+          targetTabId,
+          {
+            // TODO susceptible to XSS
+            code: `document.querySelector('${data.pageSelector}').innerText;`
+          }, pageSelectorData => {
+            // Only click if the configured page is visible
+            if(pageSelectorData[0] === data.pageValue) {
               // Note: timeout needed to run executeScript in this callback
               setTimeout(() => {
+                console.log('Accept!');
                 // Click the element
                 chrome.tabs.executeScript(
                   targetTabId,
@@ -79,11 +76,11 @@ function setIntervalOn(tabs) {
                     });
                   });
               }, 100);
-            });
-          } else {
-            console.log('Not on configured page');
-          }
-        });
+            } else {
+              console.log('Not on configured page');
+            }
+          });
+      });
     }, data.reloadTimer);
   });
 }
@@ -93,8 +90,6 @@ function setIntervalOn(tabs) {
 //   //   chrome.tabs.executeScript(tabId, {file: "program.js"} );
 //   // }
 // });
-
-// TODO only run for supplied tab
 
 function setIntervalOff() {
   console.log('%csetIntervalOff', 'color: red; font-weight: bold;');
