@@ -7,3 +7,8 @@ Periodically check if a page shows a dialog and automatically accept
 Authoring: https://developer.chrome.com/extensions/getstarted
 
 Uses https://materializecss.com 
+
+
+## Developer notes
+
+* Outside background.js log with ```chrome.extension.getBackgroundPage().console.log('Interval!');```

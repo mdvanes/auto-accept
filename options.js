@@ -1,7 +1,19 @@
 let activeToggle = document.getElementById('activeToggle');
+let reloadTimer = document.getElementById('reloadTimer');
 let buttonSelector = document.getElementById('buttonSelector');
 let pageSelector = document.getElementById('pageSelector');
 let pageValue = document.getElementById('pageValue');
+
+// function bindOnChangeSetStorage(elems) {
+//   for(elem of elems) {
+//     console.log('registering for ', elem.id);
+//     elem.onchange = event => {
+//       chrome.storage.sync.set({ [elem.id]: event.target.value }, _, x => {
+//         console.log(x);
+//       });
+//     }
+//   }
+// }
 
 function constructOptions() {
   chrome.storage.sync.get([
@@ -13,7 +25,7 @@ function constructOptions() {
     'pageValue'
   ], data => {
     document.getElementById('counter').innerText = data.acceptCounter;
-    document.getElementById('reloadTimer').value = data.reloadTimer;
+    reloadTimer.value = data.reloadTimer;
     buttonSelector.value = data.buttonSelector;
     pageSelector.value = data.pageSelector;
     pageValue.value = data.pageValue;
@@ -37,6 +49,10 @@ function constructOptions() {
       }
   };
 
+  reloadTimer.onchange = event => {
+    chrome.storage.sync.set({ reloadTimer: event.target.value });
+  };
+
   buttonSelector.onchange = event => {
     chrome.storage.sync.set({ buttonSelector: event.target.value });
   };
@@ -49,23 +65,26 @@ function constructOptions() {
     chrome.storage.sync.set({ pageValue: event.target.value });
   };
 
+  // bindOnChangeSetStorage([reloadTimer, pageSelector, pageValue, buttonSelector]);
+
   chrome.storage.onChanged.addListener(changes => {
     console.log('a0', changes);
     if(changes.acceptCounter) {
       document.getElementById('counter').innerText = changes.acceptCounter.newValue;
     }
-    if(changes.reloadTimer) {
-      document.getElementById('reloadTimer').value = changes.reloadTimer.newValue;
-    }
-    if(changes.buttonSelector) {
-      buttonSelector.value = changes.buttonSelector.newValue;
-    }
-    if(changes.pageSelector) {
-      pageSelector.value = changes.pageSelector.newValue;
-    }
-    if(changes.pageValue) {
-      pageValue.value = changes.pageValue.newValue;
-    }
+    // These properties can actually not be changed outside the options page
+    // // if(changes.reloadTimer) {
+    // //   document.getElementById('reloadTimer').value = changes.reloadTimer.newValue;
+    // // }
+    // // if(changes.buttonSelector) {
+    // //   buttonSelector.value = changes.buttonSelector.newValue;
+    // // }
+    // // if(changes.pageSelector) {
+    // //   pageSelector.value = changes.pageSelector.newValue;
+    // // }
+    // // if(changes.pageValue) {
+    // //   pageValue.value = changes.pageValue.newValue;
+    // // }
     if(changes.isActive) {
       //console.log('a1', changes.isActive.newValue)
       if(changes.isActive.newValue) {
