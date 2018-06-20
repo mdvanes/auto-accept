@@ -13,7 +13,11 @@ activeToggle.onclick = function(event) {
   chrome.storage.sync.set({ isActive: event.target.checked }, function () {
     if(event.target.checked) {
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.extension.getBackgroundPage().setIntervalOn(tabs);
+        const result = chrome.extension.getBackgroundPage().setIntervalOn(tabs);
+        // If invalid (e.g. not on https), turn off (result must be false, not undefined)
+        if(result === false) {
+          chrome.storage.sync.set({ isActive: false });
+        }
       });
     } else {
       chrome.extension.getBackgroundPage().setIntervalOff();
