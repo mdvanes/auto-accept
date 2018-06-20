@@ -29,6 +29,51 @@ function isOkProtocol(url, protocols) {
 const acceptedProtocols = ['http', 'https', 'file'];
 let aaInterval;
 
+function checkPageAndClick(targetTabId, data) {
+  // Check if the element is available that indicates that this is the configured page
+  chrome.tabs.executeScript(
+    targetTabId,
+    {
+      // TODO susceptible to XSS
+      code: `document.querySelector('${data.pageSelector}').innerText;`
+    }, pageSelectorData => {
+      // Only click if the configured page is visible
+      if(pageSelectorData[0] === data.pageValue) {
+        // Note: timeout needed to run executeScript in this callback
+        setTimeout(() => {
+          console.log('Accept!');
+          // Click the element
+          chrome.tabs.executeScript(
+            targetTabId,
+            {
+              // TODO susceptible to XSS
+              code: `document.querySelector('${data.buttonSelector}').click();`
+            }, () => {
+              chrome.storage.sync.get('acceptCounter', acceptCounterData => {
+                const acceptCounter = acceptCounterData.acceptCounter + 1;
+                chrome.storage.sync.set({ acceptCounter });
+                chrome.browserAction.setBadgeText({text: `${acceptCounter}`});
+              });
+              // Because of service worker, it might be needed to submit one more time after succesful submit
+              setTimeout(() => {
+
+                chrome.tabs.executeScript(
+                  targetTabId,
+                  {
+                    // TODO susceptible to XSS
+                    code: `document.querySelector('${data.buttonSelector}').click();`
+                  }, () => {
+                  });
+
+              }, 3000);
+            });
+        }, 100);
+      } else {
+        console.log('Not on configured page');
+      }
+    });
+}
+
 // TODO unravel Pyramid of Doom
 // tab id is unique for browser session, tabs[0] is the initiating tab
 function setIntervalOn(tabs) {
@@ -64,97 +109,14 @@ function setIntervalOn(tabs) {
     chrome.storage.sync.set({ acceptCounter: 0 });
 
     // Run once before interval, in case the target page is showing when the user enables the plugin
-    // Check if the element is available that indicates that this is the configured page
-    chrome.tabs.executeScript(
-      targetTabId,
-      {
-        // TODO susceptible to XSS
-        code: `document.querySelector('${data.pageSelector}').innerText;`
-      }, pageSelectorData => {
-        // Only click if the configured page is visible
-        if(pageSelectorData[0] === data.pageValue) {
-          // Note: timeout needed to run executeScript in this callback
-          setTimeout(() => {
-            console.log('Accept!');
-            // Click the element
-            chrome.tabs.executeScript(
-              targetTabId,
-              {
-                // TODO susceptible to XSS
-                code: `document.querySelector('${data.buttonSelector}').click();`
-              }, () => {
-                chrome.storage.sync.get('acceptCounter', acceptCounterData => {
-                  const acceptCounter = acceptCounterData.acceptCounter + 1;
-                  chrome.storage.sync.set({ acceptCounter });
-                  chrome.browserAction.setBadgeText({text: `${acceptCounter}`});
-                });
-                // Because of service worker, it might be needed to submit one more time after succesful submit
-                setTimeout(() => {
-
-                  chrome.tabs.executeScript(
-                    targetTabId,
-                    {
-                      // TODO susceptible to XSS
-                      code: `document.querySelector('${data.buttonSelector}').click();`
-                    }, () => {
-                    });
-
-                }, 3000);
-              });
-          }, 100);
-        } else {
-          console.log('Not on configured page');
-        }
-      });
-
+    checkPageAndClick(targetTabId, data);
 
     // Only run on tab where toggle was set to true, but can be turned off anywhere
     aaInterval = setInterval(() => {
       // First reload tab to see if the configured page is returned
       chrome.tabs.reload(targetTabId, {bypassCache: true}, () => {
-        // Check if the element is available that indicates that this is the configured page
-        chrome.tabs.executeScript(
-          targetTabId,
-          {
-            // TODO susceptible to XSS
-            code: `document.querySelector('${data.pageSelector}').innerText;`
-          }, pageSelectorData => {
-            // Only click if the configured page is visible
-            if(pageSelectorData[0] === data.pageValue) {
-              // Note: timeout needed to run executeScript in this callback
-              setTimeout(() => {
-                console.log('Accept!');
-                // Click the element
-                chrome.tabs.executeScript(
-                  targetTabId,
-                  {
-                    // TODO susceptible to XSS
-                    code: `document.querySelector('${data.buttonSelector}').click();`
-                  }, () => {
-                    chrome.storage.sync.get('acceptCounter', acceptCounterData => {
-                      const acceptCounter = acceptCounterData.acceptCounter + 1;
-                      chrome.storage.sync.set({ acceptCounter });
-                      chrome.browserAction.setBadgeText({text: `${acceptCounter}`});
-                    });
-                    // Because of service worker, it might be needed to submit one more time after succesful submit
-                    setTimeout(() => {
-
-                      chrome.tabs.executeScript(
-                        targetTabId,
-                        {
-                          // TODO susceptible to XSS
-                          code: `document.querySelector('${data.buttonSelector}').click();`
-                        }, () => {
-                        });
-
-                    }, 3000);
-                  });
-              }, 100);
-            } else {
-              console.log('Not on configured page');
-            }
-          });
-      });
+          checkPageAndClick(targetTabId, data);
+        });
     }, data.reloadTimer);
   });
 }
