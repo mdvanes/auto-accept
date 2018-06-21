@@ -1,6 +1,6 @@
 {
     "name": "AutoAccept",
-    "version": "1.0",
+    "version": "1.1.0",
     "description": "Auto accept dialog periodically",
     "permissions": [
       "activeTab",
