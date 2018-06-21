@@ -30,6 +30,12 @@ function isOkProtocol(url, protocols) {
 const acceptedProtocols = ['http', 'https', 'file'];
 let aaInterval;
 
+function simpleTimeout(delay) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, delay);
+  });
+}
+
 async function checkPageAndClick(targetTabId, data) {
   try {
     // Check if the element is available that indicates that this is the configured page
@@ -41,30 +47,28 @@ async function checkPageAndClick(targetTabId, data) {
     // Only click if the configured page is visible
     if(pageSelectorData[0] === data.pageValue) {
       // Note: timeout needed to run executeScript in this callback
-      // TODO async timeout
-      setTimeout(async () => {
-        console.log('Accept!');
+      await simpleTimeout(100);
+      console.log('Accept!');
 
-        // Click the element
-        await chrome.tabs.executeScript(targetTabId, {
-          // TODO susceptible to XSS
-          code: `document.querySelector('${data.buttonSelector}').click();`
-        });
+      // Click the element
+      await chrome.tabs.executeScript(targetTabId, {
+        // TODO susceptible to XSS
+        code: `document.querySelector('${data.buttonSelector}').click();`
+      });
 
-        // Update the counter state and badge
-        const acceptCounterData = await chrome.storage.sync.get('acceptCounter');
-        const acceptCounter = acceptCounterData.acceptCounter + 1;
-        await chrome.storage.sync.set({ acceptCounter });
-        await chrome.browserAction.setBadgeText({text: `${acceptCounter}`});
+      // Update the counter state and badge
+      const acceptCounterData = await chrome.storage.sync.get('acceptCounter');
+      const acceptCounter = acceptCounterData.acceptCounter + 1;
+      await chrome.storage.sync.set({ acceptCounter });
+      await chrome.browserAction.setBadgeText({text: `${acceptCounter}`});
 
-        // Because of service worker, it might be needed to submit one more time after succesful submit
-        setTimeout(async () => {
-          await chrome.tabs.executeScript( targetTabId, {
-            // TODO susceptible to XSS
-            code: `document.querySelector('${data.buttonSelector}').click();`
-          });
-        }, 3000); // Wait for page to load after submit
-      }, 100);
+      // Wait for page to load after submit
+      await simpleTimeout(3000);
+      // Because of service worker, it might be needed to submit one more time after succesful submit
+      await chrome.tabs.executeScript( targetTabId, {
+        // TODO susceptible to XSS
+        code: `document.querySelector('${data.buttonSelector}').click();`
+      });
     } else {
       console.log('Not on configured page');
     }
