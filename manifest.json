@@ -13,6 +13,7 @@
     ],
     "background": {
         "scripts": [
+            "vendor/js/chrome-extension-async.js",
             "background.js"
         ],
         "persistent": false
